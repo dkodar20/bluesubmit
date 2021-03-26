@@ -1,6 +1,6 @@
 Bluesubmit
 =================
-A fork of [Codeforces Parser](https://github.com/johnathan79717/codeforces-parser) with added functionality of submitting code through _CLI_.
+A tool to parse Codeforces problems and submit solutions using Linux terminal.
 
 ## Installation
  The tool has dependencies on the following python packages - Click, robobrowser, requests. To install them you may either create a virtual environment or install them globally. Remember that you would need the virtual environment activated each time you use the tool.
@@ -8,7 +8,14 @@ A fork of [Codeforces Parser](https://github.com/johnathan79717/codeforces-parse
  pip install Click
  pip install robobrowser
  pip install requests
+ pip install python-memcached
  ```
+ Additionally, it also depends on the package [memcached](https://memcached.org/). Memcached is used to store the logged in session in cache, so that logging in again is not required while submitting a solution. The download in available in the link and also in the Arch User Repository and the Debian apt repositories. You may additionally require to start the memcached service by
+ ```
+ sudo systemctl enable memcached.service
+ sudo systemctl start memcached.service
+ ```
+ 
  To use this tool, clone this repository to your system and add the directory to path variables.
  You may also consider adding all the files and folders of the repository to an already existing path.
 
@@ -21,7 +28,7 @@ A fork of [Codeforces Parser](https://github.com/johnathan79717/codeforces-parse
  ```
 
 ## Usage
-Parse the contest
+### Parsing the contest
 ```bash
 cf-sample-gen 1469
 ```
@@ -34,6 +41,15 @@ You may also add your own additional debugging flags in `cf-sample-gen`. Add a `
 ```bash
 ./test.sh -d
 ```
+
+### Logging in and submitting solutions
+To submit your solutions, first to you need to enter the Codeforces system. To do this type
+```bash
+enter
+```
+Now enter your login credentials and you are good to go to submit the solutions.
+Note that you need to enter Codeforces just once, and logging in again will be required only when you restart your system.
+
 To submit the code which is parsed from the bluesubmit tool just type
 ```bash
 submit
@@ -49,5 +65,5 @@ submit --id=1469A --file=A.cc
 - Individual problem parsing
 
 # Credits
-- Forked from [Codeforces Parser](https://github.com/johnathan79717/codeforces-parser)
+- [Codeforces Parser](https://github.com/johnathan79717/codeforces-parser)
 - [idne](https://github.com/endiliey/idne)
