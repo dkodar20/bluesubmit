@@ -1,19 +1,11 @@
 #!/usr/bin/python
 
-try:
-    from urllib2 import urlopen
-except:
-    from urllib.request import urlopen
-try:
-    from HTMLParser import HTMLParser
-except:
-    from html.parser import HTMLParser
+
+from urllib.request import urlopen
+from html.parser import HTMLParser
 
 # Other libraries.
-from sys import argv
 from subprocess import call
-from functools import partial, wraps
-
 import os
 import re
 import argparse
