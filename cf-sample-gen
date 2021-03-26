@@ -1,19 +1,11 @@
 #!/usr/bin/python
 
-try:
-    from urllib2 import urlopen
-except:
-    from urllib.request import urlopen
-try:
-    from HTMLParser import HTMLParser
-except:
-    from html.parser import HTMLParser
+
+from urllib.request import urlopen
+from html.parser import HTMLParser
 
 # Other libraries.
-from sys import argv
 from subprocess import call
-from functools import partial, wraps
-
 import time
 import os
 import re
@@ -219,7 +211,7 @@ def generate_test_script(folder, language, num_tests, problem):
 
 # Main function.
 def main():
-    print (VERSION)
+    print(VERSION)
     parser = argparse.ArgumentParser()
     parser.add_argument('--language', '-l', default="c++17", help="The programming language you want to use "
             "(c++17, go)")
@@ -230,19 +222,19 @@ def main():
     language = args.language
 
     # Find contest and problems.
-    print ('Parsing contest %s for language %s, please wait...' % (contest, language))
+    print('Parsing contest %s for language %s, please wait...' % (contest, language))
     content = parse_contest(contest)
     while len(content.problems) == 0:
         content = parse_contest(contest)
         time.sleep(0.05)
 
-    print (BOLD+GREEN_F+'*** Round name: '+content.name+' ***'+NORM)
-    print ('Found %d problems!' % (len(content.problems)))
+    print(BOLD+GREEN_F+'*** Round name: '+content.name+' ***'+NORM)
+    print('Found %d problems!' % (len(content.problems)))
 
     # Find problems and test cases.
     TEMPLATE = language_params[language]["TEMPLATE"]
     for index, problem in enumerate(content.problems):
-        print ('Downloading Problem %s: %s...' % (problem, content.problem_names[index]))
+        print('Downloading Problem %s: %s...' % (problem, content.problem_names[index]))
         folder = os.getcwd() + ('/%s/' % problem)
         call(['mkdir', '-p', folder])
         call(['cp', '-n', TEMPLATE, '%s/%s.%s' % (folder, problem, TEMPLATE.split('.')[1])])
@@ -257,10 +249,10 @@ def main():
         num_tests = parse_problem(folder, contest, problem)
         print('%d sample test(s) found.' % num_tests)
         generate_test_script(folder, language, num_tests, problem)
-        print ('========================================')
+        print('========================================')
 
-    print ('Use ./test.sh to run sample tests in each directory.')
-    print ('Press enter to proceed to code.\n')
+    print('Use ./test.sh to run sample tests in each directory.')
+    print('Press enter to proceed to code.\n')
     while True:
         key = readchar.readkey()
         if (key == '\x0d'):
@@ -270,6 +262,7 @@ def main():
     for index, problem in enumerate(content.problems):
         folder = os.getcwd() + ('/%s/' % problem)
         call(['subl3', '%s/%s.%s' % (folder, problem, TEMPLATE.split('.')[1])])
+
 
 if __name__ == '__main__':
     main()
