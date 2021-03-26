@@ -14,10 +14,12 @@ from sys import argv
 from subprocess import call
 from functools import partial, wraps
 
+import time
 import os
 import re
 import argparse
 import platform
+import readchar
 
 
 ###########################
@@ -25,11 +27,23 @@ import platform
 ###########################
 language_params = {
         'c++17' : {
-            'TEMPLATE'    : 'utils/main.cc',
-            'DEBUG_FLAGS' : '"-g -Wall -Wextra -Wshadow"',
-            'COMPILE_CMD' : 'g++ -std=c++17 $DBG',
+            'TEMPLATE'    : '/home/blueconch/bluesubmit/utils/main.cc',
+            'DEBUG_FLAGS' : '"-O2 -pthread -Wall -Wextra -Wshadow -Wno-unused-result -Wconversion -Wformat=2 -Wfloat-equal -Wlogical-op -Wshift-overflow=2 -Wduplicated-cond -Wcast-qual -Wcast-align -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC -D_FORTIFY_SOURCE=2 -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -fstack-protector-all -fsanitize=float-divide-by-zero -fsanitize=float-cast-overflow -DRUDR_DEBUG"',
+            'COMPILE_CMD' : 'g++ -g -std=c++17 $DBG',
             'RUN_CMD'     : './a.out'
-            }
+            },
+        'go'    : {
+            'TEMPLATE'    : '/home/blueconch/bluesubmit/utils/main.go',
+            'COMPILE_CMD' : 'go build $DBG -o a.out',
+            'DEBUG_FLAGS' : '''"-ldflags '-X=main.DEBUG=Y'"''',
+            'RUN_CMD'     : './a.out'
+            },
+        'kotlin'    : {
+            'TEMPLATE'    : '/home/blueconch/bluesubmit/utils/main.kt',
+            'COMPILE_CMD' : 'kotlinc -include-runtime -d out.jar',
+            'DEBUG_FLAGS' : "-d",
+            'RUN_CMD'     : 'java -jar out.jar $DBG'
+            },
         }
 
 
@@ -44,7 +58,6 @@ RED_F='\033[31m'
 GREEN_F='\033[32m'
 BOLD='\033[1m'
 NORM='\033[0m'
-
 if (platform.system() == "Darwin"):
     TIME_CMD='`which gtime` -o time.out -f "(%es)"'
 else:
@@ -233,7 +246,7 @@ def main():
     content = parse_contest(contest)
     while len(content.problems) == 0:
         content = parse_contest(contest)
-        time.sleep(0.1)
+        time.sleep(0.05)
 
     print (BOLD+GREEN_F+'*** Round name: '+content.name+' ***'+NORM)
     print ('Found %d problems!' % (len(content.problems)))
@@ -246,14 +259,12 @@ def main():
         call(['mkdir', '-p', folder])
         call(['cp', '-n', TEMPLATE, '%s/%s.%s' % (folder, problem, TEMPLATE.split('.')[1])])
 
-        with open('%s/%s.%s' % (folder, problem, TEMPLATE.split('.')[1]), encoding = 'utf-8') as f:
-            lines = f.readlines()
+        try:
+            f = open('%s/%s.%s' % (folder, problem, TEMPLATE.split('.')[1]), mode='w', encoding = 'utf-8')
+            f.write("// Problem ID - {}{}\n".format(contest, problem))
 
-        lines
-        lines[0] = "// Problem ID - {}{}\n".format(contest, problem)
-
-        with open('%s/%s.%s' % (folder, problem, TEMPLATE.split('.')[1]), mode = 'w', encoding = 'utf-8') as f:
-            f.writelines(lines)
+        finally:
+            f.close()
 
         num_tests = parse_problem(folder, contest, problem)
         print('%d sample test(s) found.' % num_tests)
@@ -261,7 +272,16 @@ def main():
         print ('========================================')
 
     print ('Use ./test.sh to run sample tests in each directory.')
+    print ('Press enter to proceed to code.\n')
+    while True:
+        key = readchar.readkey()
+        if (key == '\x0d'):
+            break
+        time.sleep(0.2)
 
+    for index, problem in enumerate(content.problems):
+        folder = os.getcwd() + ('/%s/' % problem)
+        call(['subl3', '%s/%s.%s' % (folder, problem, TEMPLATE.split('.')[1])])
 
 if __name__ == '__main__':
     main()
