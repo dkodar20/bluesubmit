@@ -261,7 +261,7 @@ def main():
 
     for index, problem in enumerate(content.problems):
         folder = os.getcwd() + ('/%s/' % problem)
-        call(['subl3', '%s/%s.%s' % (folder, problem, TEMPLATE.split('.')[1])])
+        call(['subl', '%s/%s.%s' % (folder, problem, TEMPLATE.split('.')[1])])
 
 
 if __name__ == '__main__':
