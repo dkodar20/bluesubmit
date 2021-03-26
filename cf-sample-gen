@@ -32,18 +32,6 @@ language_params = {
             'COMPILE_CMD' : 'g++ -g -std=c++17 $DBG',
             'RUN_CMD'     : './a.out'
             },
-        'go'    : {
-            'TEMPLATE'    : '/home/blueconch/bluesubmit/utils/main.go',
-            'COMPILE_CMD' : 'go build $DBG -o a.out',
-            'DEBUG_FLAGS' : '''"-ldflags '-X=main.DEBUG=Y'"''',
-            'RUN_CMD'     : './a.out'
-            },
-        'kotlin'    : {
-            'TEMPLATE'    : '/home/blueconch/bluesubmit/utils/main.kt',
-            'COMPILE_CMD' : 'kotlinc -include-runtime -d out.jar',
-            'DEBUG_FLAGS' : "-d",
-            'RUN_CMD'     : 'java -jar out.jar $DBG'
-            },
         }
 
 
