@@ -1,0 +1,48 @@
+#!/usr/bin/python
+
+import click
+import getpass
+from robobrowser import RoboBrowser
+import memcache
+import sys
+import copy
+
+
+class User:
+    def __init__(self, username):
+        self.username = username
+
+    browser = RoboBrowser(parser='html.parser')
+
+    def login(self):
+        self.browser.open('http://codeforces.com/enter')
+
+        enter_form = self.browser.get_form('enterForm')
+        password = getpass.getpass(prompt="Password: ", stream=None)
+        enter_form['handleOrEmail'] = self.username
+        enter_form['password'] = password
+        self.browser.submit_form(enter_form)
+
+        temp = copy.deepcopy(self.browser)
+        checks = list(map(lambda x: x.getText()[1:].strip(), temp.select('div.caption.titled')))
+        if self.username not in checks:
+            click.secho('Sorry, try again.', fg='red')
+            self.login()
+            return
+
+        click.secho('[{0}] login successful! '.format(self.username), fg='green')
+        return
+
+
+def main():
+    uname = input("Username: ")
+    sys.setrecursionlimit(10000)
+    session = User(uname)
+    session.login()
+    shared = memcache.Client(['127.0.0.1:11211'], debug=0)
+    shared.set('browser', session.browser)
+    shared.set('username', session.username)
+
+
+if __name__ == "__main__":
+    main()

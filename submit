@@ -1,0 +1,119 @@
+#!/usr/bin/python
+    
+import os
+import requests
+import click
+import time
+import memcache
+
+session = memcache.Client(['127.0.0.1:11211'], debug=0)
+username = session.get('username')
+browser = session.get('browser')
+
+
+def safe_get(dct, key):
+    try:
+        dct = dct[key]
+    except KeyError:
+        return None
+    return dct
+
+
+def get_latest_verdict(user):
+    r = requests.get('http://codeforces.com/api/user.status?' +
+                     'handle={}&from=1&count=1'.format(user))
+    js = r.json()
+    if 'status' not in js or js['status'] != 'OK':
+        raise ConnectionError('Cannot connect to codeforces!')
+    try:
+        result = js['result'][0]
+        id_ = result['id']
+        verdict_ = safe_get(result, 'verdict')
+        time_ = result['timeConsumedMillis']
+        memory_ = result['memoryConsumedBytes'] / 1000
+        passed_test_count_ = result['passedTestCount']
+    except Exception as e:
+        raise ConnectionError('Cannot get latest submission, error')
+    return id_, verdict_, time_, memory_, passed_test_count_
+
+
+@click.command()
+@click.option('--id', default='', help='Specify problem ID')
+@click.option('--file', default='', help='Specify soltuion file')
+def cli(id, file):
+    # get latest submission id, so when submitting should have not equal id
+    global fi
+    prob_id = id
+    filename = file
+    last_id, b, c, d, e = get_latest_verdict(username)
+
+    if filename == '':
+        # work to be done
+        temp = os.getcwd()[-1]
+        if 0 <= ord(temp) - ord('0') <= 9:
+            temp = os.getcwd()[-2:]
+
+        filename = (temp + '.cc')
+
+    if prob_id == '':
+        try:
+            fi = open(filename, mode='r', encoding='utf-8')
+            prob_id = fi.readline()[16:]
+        finally:
+            fi.close()
+
+    contest_id = ''
+    for char in prob_id:
+        if 0 <= ord(char) - ord('0') <= 9:
+            contest_id += char
+        else:
+            break
+
+    temp = prob_id
+    prob_id = ''
+    for char in temp:
+        if char != '\n':
+            prob_id += char
+
+    prob = prob_id[-1]
+    if 0 <= ord(prob) - ord('0') <= 9:
+        prob = prob_id[-2:]
+
+    click.secho('Submitting [{1}] for problem [{0}]'.format(prob_id, filename), fg='green')
+
+    browser.open('https://codeforces.com/contest/{0}/submit/{1}'.format(contest_id, prob))
+    submit_form = browser.get_form(class_='submit-form')
+
+    try:
+        submit_form['sourceFile'] = filename
+    except Exception as e:
+        click.secho('File {0} not found in current directory'.format(filename))
+        return
+    browser.submit_form(submit_form)
+
+    click.secho('{}'.format(browser.url), fg='yellow')
+
+    if browser.url[-12:] != 'status?my=on' and browser.url[-6:] != 'submit' and browser.url[-2:] != 'my':
+        click.secho('Failed submission, probably you have submit the same file before', fg='red')
+        return
+
+    click.secho('[{0}] submitted ...'.format(filename), fg='green')
+    has_started = False
+
+    while True:
+        id_, verdict_, time_, memory_, passed_test_count_ = get_latest_verdict(username)
+        if id_ != last_id and verdict_ != 'TESTING' and verdict_ is not None:
+            if verdict_ == 'OK':
+                click.secho('OK - Passed {} tests'.format(passed_test_count_), fg='green')
+            else:
+                click.secho("{} on test {}".format(verdict_, passed_test_count_ + 1), fg='red')
+            click.secho('{} MS | {} KB'.format(time_, memory_), fg=('green' if verdict_ == 'OK' else 'red'))
+            break
+        elif verdict_ == 'TESTING' and (not has_started):
+            click.secho("Judgment has begun", fg='green')
+            has_started = True
+        time.sleep(0.1)
+
+
+if __name__ == '__main__':
+    cli()
