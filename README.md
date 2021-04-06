@@ -3,10 +3,10 @@ Bluesubmit
 A tool to parse Codeforces problems and submit solutions using Linux terminal.
 
 ## Installation
- The tool has dependencies on the following python packages - Click, robobrowser, requests. To install them you may either create a virtual environment or install them globally. Remember that you would need the virtual environment activated each time you use the tool.
+ The tool has dependencies on the following python packages - Click, robobrowser, requests. To install them you may either create a virtual environment or install them globally. Remember that you would need the virtual environment activated each time you use the tool. You would need to have chrome/chromium and the corresponding drivers for selenium to work.
  ```bash
  pip install Click
- pip install robobrowser
+ pip install selenium
  pip install requests
  pip install python-memcached
  ```
