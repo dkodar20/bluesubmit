@@ -3,7 +3,7 @@ Bluesubmit
 A tool to parse Codeforces problems and submit solutions using Linux terminal.
 
 ## Installation
- The tool has dependencies on the following python packages - Click, robobrowser, requests. To install them you may either create a virtual environment or install them globally. Remember that you would need the virtual environment activated each time you use the tool. You would need to have chrome/chromium and the corresponding drivers for selenium to work.
+ The tool has dependencies on the following python packages - Click, Selenium, requests and python-memcached. To install them you may either create a virtual environment or install them globally. Remember that you would need the virtual environment activated each time you use the tool. You would need to have chrome/chromium and the corresponding drivers for selenium to work.
  ```bash
  pip install Click
  pip install selenium
@@ -32,7 +32,7 @@ A tool to parse Codeforces problems and submit solutions using Linux terminal.
 ```bash
 cf-sample-gen 1469
 ```
-This will create directories with names as A, B, C, D and so on, each of which has the problem file, sample inputs and outputs parsed from the problem. Additionally each of the problem directories will have a `test.sh` file whivh is used in checking solution against the sample cases.
+This will create directories with names as A, B, C, D and so on, each of which has the problem file, sample inputs and outputs parsed from the problem. Additionally each of the problem directories will have a `test.sh` file which is used in checking solution against the sample cases.
 To run your code against the sample test cases, navigate to your problem directory and execute the `test.sh` file as follows -
 ```bash
 ./test.sh
