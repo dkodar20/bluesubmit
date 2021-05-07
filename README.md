@@ -65,6 +65,7 @@ submit --id=1469A --file=A.cc
 
 ## Todos
 - Individual problem parsing
+- Add more gifs :D
 
 # Credits
 - [Codeforces Parser](https://github.com/johnathan79717/codeforces-parser)
