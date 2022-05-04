@@ -50,8 +50,6 @@ enter
 Now enter your login credentials and you are good to go to submit the solutions.
 Note that you need to enter Codeforces just once, and logging in again will be required only when you restart your system.
 
-![](gifs/enter-final.gif)
-
 To submit the code which is parsed from the bluesubmit tool just type
 ```bash
 submit
